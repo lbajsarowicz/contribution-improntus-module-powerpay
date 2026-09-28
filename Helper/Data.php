@@ -4,9 +4,10 @@ namespace Improntus\PowerPay\Helper;
 
 use Magento\Framework\Encryption\EncryptorInterface;
 use Magento\Framework\App\Config\ScopeConfigInterface;
-use Improntus\PowerPay\Logger\Logger;
 use Magento\Sales\Model\Order;
 use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 
 class Data
 {
@@ -19,6 +20,7 @@ class Data
     public const ACTIVE = 'active';
     public const TITLE = 'title';
     public const DEBUG = 'debug';
+    public const MASK_AUTH_TOKEN = 'mask_auth_token';
     public const MERCHANT_ID = 'merchant_id';
     public const CONCEPT = 'concept';
     public const CANCEL_HOURS = 'cancel_hours';
@@ -35,10 +37,23 @@ class Data
     public const PRODUCT_WIDGET_DEFAULT = 1;
     public const PRODUCT_WIDGET_NEUTRAL = 2;
 
+    private const LOG_LEVELS = [
+        'critical' => LogLevel::CRITICAL,
+        'error' => LogLevel::ERROR,
+        'warning' => LogLevel::WARNING,
+        'info' => LogLevel::INFO,
+        'debug' => LogLevel::DEBUG,
+    ];
+
     /**
-     * @var Logger
+     * @var LoggerInterface
      */
-    private $logger;
+    private $debugLogger;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $errorLogger;
 
     /**
      * @var EncryptorInterface
@@ -60,16 +75,21 @@ class Data
      * /**
      * @param EncryptorInterface $encryptor
      * @param ScopeConfigInterface $scopeConfig
+     * @param LoggerInterface $debugLogger
+     * @param LoggerInterface $errorLogger
+     * @param StoreManagerInterface $storeManager
      */
     public function __construct(
         EncryptorInterface $encryptor,
         ScopeConfigInterface $scopeConfig,
-        Logger $logger,
+        LoggerInterface $debugLogger,
+        LoggerInterface $errorLogger,
         StoreManagerInterface $storeManager
     )
     {
         $this->storeManager = $storeManager;
-        $this->logger = $logger;
+        $this->debugLogger = $debugLogger;
+        $this->errorLogger = $errorLogger;
         $this->encryptor = $encryptor;
         $this->scopeConfig = $scopeConfig;
     }
@@ -154,6 +174,15 @@ class Data
     public function isDebugEnabled($storeId = null)
     {
         return (bool)$this->getConfigData(self::DEBUG, $storeId);
+    }
+
+    /**
+     * @param $storeId
+     * @return bool
+     */
+    public function isAuthTokenMasked($storeId = null)
+    {
+        return (bool)$this->getConfigData(self::MASK_AUTH_TOKEN, $storeId);
     }
 
     /**
@@ -282,18 +311,21 @@ class Data
     }
 
     /**
-     * @param $message
+     * Errors are always written to error.log; every level goes to debug.log when Debug is enabled.
+     *
+     * @param string $message
+     * @param string $type critical|error|warning|info|debug
      * @return void
      */
     public function log($message, $type = 'debug')
     {
+        $level = self::LOG_LEVELS[$type] ?? LogLevel::INFO;
+
+        if ($level === LogLevel::CRITICAL || $level === LogLevel::ERROR) {
+            $this->errorLogger->log($level, $message);
+        }
         if ($this->isDebugEnabled()) {
-            $this->logger->setName('Powerpay');
-            if ($type !== 'debug') {
-                $this->logger->info($message);
-            } else {
-                $this->logger->debug($message);
-            }
+            $this->debugLogger->log($level, $message);
         }
     }
 

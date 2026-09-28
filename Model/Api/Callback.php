@@ -71,7 +71,7 @@ class Callback implements CallbackInterface
                     }
                     $message .= "<== End webhook request ==> \n";
                     $message .= "Local signature: {$signature} \n";
-                    $this->helper->log($message);
+                    $this->helper->log($message, 'error');
 
                     $response = new \Magento\Framework\Webapi\Exception(__('Authentication failed'));
                 }

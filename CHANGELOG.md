@@ -1,6 +1,16 @@
 CHANGELOG
 ---------
 
+### 1.2.2 (2026-09-28)
+
+* Fixed logging workflow: the handler only accepted `INFO` while every call logged at `DEBUG`
+* Log files are now `var/log/powerpay/debug.log` (full trace, only when Debug is enabled) and `var/log/powerpay/error.log` (errors and critical failures, always written regardless of the Debug flag). `var/log/powerpay/info.log` is no longer used
+* Existing log calls now use the proper level: failed invoices and failed transaction persistence are logged as `CRITICAL`
+* API requests and responses (method, URL, payload, HTTP status and body) are logged to `debug.log`; failed responses also go to `error.log`
+* Added the "Mask Authorization Token in Logs" setting (enabled by default): the Authorization header is logged as its SHA-256 hash and length, or as the raw value when disabled
+* `Helper\Data::log()` keeps its signature and now accepts `critical`, `error`, `warning`, `info` and `debug` as `$type`
+* Removed `Improntus\PowerPay\Logger\Logger`, `Improntus\PowerPay\Logger\Handler\CustomHandler` and the unused `PowerPayLogger` virtual type. `Helper\Data` constructor now takes `$debugLogger` and `$errorLogger`
+
 ### 1.2.1 (2026-08-24)
 
 * Compatibility with Adobe Commerce and Magento Open Source 2.4.9

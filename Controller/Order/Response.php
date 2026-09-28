@@ -82,11 +82,6 @@ class Response implements ActionInterface
             $this->powerPay->persistTransaction($order, $result);
             if ($result['status'] == 'processed') {
                 /** order is only invoiced via webhook */
-//                if ($this->powerPay->invoice($order,$transactionId)) {
-//                    $this->helper->log("Order: {$order->getIncrementId()} invoiced succesfully.");
-//                } else {
-//                    $this->helper->log("Order: {$order->getIncrementId()} was NOT invoiced.");
-//                }
                 $this->powerPay->addSuccessToStatusHistory($order);
                 $path = 'checkout/onepage/success';
             } else {

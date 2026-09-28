@@ -59,6 +59,13 @@ class WebService
                 ]
             );
             $data = json_encode($data);
+            $this->helper->log(sprintf(
+                "REQUEST %s %s\nAUTHORIZATION: %s\nPAYLOAD: %s",
+                $method,
+                $url,
+                $this->formatAuthorization($basic, $storeId),
+                $data
+            ));
             switch ($method)
             {
                 case "POST":
@@ -68,10 +75,31 @@ class WebService
                     $this->curl->get($url);
             }
 
-            return json_decode($this->curl->getBody(), true);
+            $status = $this->curl->getStatus();
+            $body = $this->curl->getBody();
+            $result = json_decode($body, true);
+            $this->helper->log(
+                sprintf("RESPONSE %s %s\nSTATUS: %s\nBODY: %s", $method, $url, $status, $body),
+                ($status >= 200 && $status < 300 && !isset($result['errors'])) ? 'info' : 'error'
+            );
+
+            return $result;
         } catch (\Exception $e) {
-            $this->helper->log($e->getMessage());
+            $this->helper->log("REQUEST {$method} {$url} failed: {$e->getMessage()}", 'error');
             return $e->getMessage();
         }
+    }
+
+    /**
+     * @param string $authorization
+     * @param int|string|null $storeId
+     * @return string
+     */
+    private function formatAuthorization($authorization, $storeId = null)
+    {
+        if (!$this->helper->isAuthTokenMasked($storeId)) {
+            return $authorization;
+        }
+        return sprintf('sha256=%s len=%d', hash('sha256', $authorization), strlen($authorization));
     }
 }

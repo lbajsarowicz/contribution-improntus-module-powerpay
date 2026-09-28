@@ -56,7 +56,7 @@ class Create implements ActionInterface
                 foreach ($response['errors'] as $error) {
                     $message .= "{$error['message']} \n";
                 }
-                $this->helper->log($message);
+                $this->helper->log($message, 'error');
                 $this->session->setPowerPayError($message);
                 $url = "{$this->helper->getCallBackUrl()}?error=true";
             } else {

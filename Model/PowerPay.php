@@ -112,7 +112,7 @@ class PowerPay
                 $data
             );
         } catch (\Exception $e) {
-            $this->helper->log($e->getMessage());
+            $this->helper->log($e->getMessage(), 'error');
             throw new \Exception($e->getMessage());
         }
         return $response ?? false;
@@ -213,7 +213,7 @@ class PowerPay
             $connection->rollBack();
             $message = "Invoice creating for order {$order->getIncrementId()} failed: \n";
             $message .= $e->getMessage() . "\n";
-            $this->helper->log($message);
+            $this->helper->log($message, 'critical');
             return false;
         }
     }
@@ -263,7 +263,7 @@ class PowerPay
                 $this->transactionRepository->save($transaction);
             }
         } catch (\Exception $e) {
-            $this->helper->log($e->getMessage());
+            $this->helper->log($e->getMessage(), 'critical');
         }
     }
 
@@ -283,7 +283,7 @@ class PowerPay
                 return true;
             }
         } catch (\Exception $e) {
-            $this->helper->log($e->getMessage());
+            $this->helper->log($e->getMessage(), 'error');
             return false;
         }
         return false;

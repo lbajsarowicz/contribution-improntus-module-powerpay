@@ -40,14 +40,6 @@
         </arguments>
     </virtualType>
 
-    <virtualType name="PowerPayLogger" type="Magento\Framework\Logger\Monolog">
-        <arguments>
-            <argument name="handlers" xsi:type="array">
-                <item name="info" xsi:type="object">Improntus\PowerPay\Logger\Handler\CustomHandler</item>
-            </argument>
-        </arguments>
-    </virtualType>
-
     <virtualType name="PowerPayValueHandlerPool" type="Magento\Payment\Gateway\Config\ValueHandlerPool">
         <arguments>
             <argument name="handlers" xsi:type="array">
@@ -62,12 +54,26 @@
         </arguments>
     </virtualType>
 
-    <type name="Improntus\PowerPay\Logger\Logger">
+    <virtualType name="PowerPayDebugLogger" type="Magento\Framework\Logger\Monolog">
         <arguments>
             <argument name="name" xsi:type="string">powerpay</argument>
             <argument name="handlers" xsi:type="array">
-                <item name="system" xsi:type="object">Improntus\PowerPay\Logger\Handler\CustomHandler</item>
+                <item name="debug" xsi:type="object">Improntus\PowerPay\Logger\Handler\Debug</item>
             </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="PowerPayErrorLogger" type="Magento\Framework\Logger\Monolog">
+        <arguments>
+            <argument name="name" xsi:type="string">powerpay</argument>
+            <argument name="handlers" xsi:type="array">
+                <item name="error" xsi:type="object">Improntus\PowerPay\Logger\Handler\Error</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Improntus\PowerPay\Helper\Data">
+        <arguments>
+            <argument name="debugLogger" xsi:type="object">PowerPayDebugLogger</argument>
+            <argument name="errorLogger" xsi:type="object">PowerPayErrorLogger</argument>
         </arguments>
     </type>
 
