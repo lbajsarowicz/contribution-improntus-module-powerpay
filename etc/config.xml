@@ -14,6 +14,8 @@
                 <can_use_checkout>1</can_use_checkout>
                 <is_gateway>0</is_gateway>
                 <sandbox>1</sandbox>
+                <api_url_production>https://api.powerpay.pe/api/</api_url_production>
+                <api_url_sandbox>https://mo-services-bbva-bnpl-pe-green.moprestamo.com/api/</api_url_sandbox>
                 <debug>0</debug>
                 <mask_auth_token>1</mask_auth_token>
             </powerpay>
