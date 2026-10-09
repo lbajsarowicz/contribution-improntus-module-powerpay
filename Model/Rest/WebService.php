@@ -18,11 +18,6 @@ class WebService
      */
     private $curl;
 
-    /**
-     * @var string
-     */
-    private $baseUrl;
-
     public function __construct(
         Curl $curl,
         Data $helper
@@ -30,7 +25,6 @@ class WebService
     {
         $this->helper = $helper;
         $this->curl = $curl;
-        $this->baseUrl = 'https://api.powerpay.pe/api/';
     }
 
     public function doRequest($endpoint, $secret,  $data=null, $method=null, $storeId = null, $options=null)
@@ -39,11 +33,7 @@ class WebService
             $method = "POST";
         }
 
-        if ($this->helper->getSandbox($storeId)) {
-            $this->baseUrl = 'https://mo-services-bbva-bnpl-pe-beta.moprestamo.com/api/';
-        }
-
-        $url = $this->baseUrl . $endpoint;
+        $url = $this->helper->getApiBaseUrl($storeId) . $endpoint;
 
         $basic = base64_encode($secret);
 

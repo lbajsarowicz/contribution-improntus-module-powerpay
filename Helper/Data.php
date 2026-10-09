@@ -15,6 +15,8 @@ class Data
     public const CLIENTID = 'clientid';
     public const SECRET = 'secret';
     public const SANDBOX = 'sandbox';
+    public const API_URL_PRODUCTION = 'api_url_production';
+    public const API_URL_SANDBOX = 'api_url_sandbox';
     public const USER_AUTHENTICATED = 1;
     public const INCOMPLETE_CREDENTIALS = 0;
     public const ACTIVE = 'active';
@@ -241,6 +243,18 @@ class Data
     public function getSandbox($storeId = null)
     {
         return (bool)$this->getConfigData(self::SANDBOX, $storeId);
+    }
+
+    /**
+     * Returns the API base URL for the active environment, always ending with a slash.
+     *
+     * @param $storeId
+     * @return string
+     */
+    public function getApiBaseUrl($storeId = null)
+    {
+        $field = $this->getSandbox($storeId) ? self::API_URL_SANDBOX : self::API_URL_PRODUCTION;
+        return rtrim(trim((string)$this->getConfigData($field, $storeId)), '/') . '/';
     }
 
 
